@@ -63,6 +63,15 @@
   .case-ref b{color:#7cc4ff;font-weight:600}
   /* 场景页左右分栏 */
   .scene{display:grid;grid-template-columns:5fr 7fr;gap:3.4vw;align-items:center}
+  /* TeleAgent 定制版外壳 */
+  .app-bar{display:flex;align-items:center;gap:1vw;background:rgba(255,255,255,.06);
+    border-bottom:1px solid var(--line);border-radius:1vw 1vw 0 0;padding:1vh 1.4vw;margin:-2.4vh -1.6vw 1.8vh}
+  .ab-logo{font-weight:700;color:#fff;background:linear-gradient(90deg,var(--red),#ff4a56);
+    padding:.2vw .8vw;border-radius:.3vw;font-size:1.05vw;letter-spacing:.1vw;white-space:nowrap}
+  .ab-name{font-size:.95vw;color:var(--dim);letter-spacing:.3vw;flex:1;text-align:center;white-space:nowrap}
+  .ab-dots{display:flex;gap:.4vw}
+  .ab-dots i{width:.45vw;height:.45vw;border-radius:50%;background:rgba(255,255,255,.22)}
+  .ab-dots i:first-child{background:var(--red)}
   .stage{position:relative;background:var(--card);border:1px solid var(--line);
     border-radius:1vw;padding:2.4vh 1.6vw;overflow:hidden}
   .stage .stage-title{font-size:1.15vw;color:var(--dim);letter-spacing:.3vw;margin-bottom:1.8vh;display:flex;justify-content:space-between}
@@ -774,6 +783,12 @@
 
 <script>
 /* ====== 展厅大屏自动轮播引擎 ====== */
+/* 注入 TeleAgent 定制版外壳到每个演示区 */
+document.querySelectorAll('.stage').forEach(function(st){
+  var bar=document.createElement('div');bar.className='app-bar';
+  bar.innerHTML='<span class="ab-logo">⬢ TeleAgent</span><span class="ab-name">数智公务员 · 中国电信定制版</span><span class="ab-dots"><i></i><i></i><i></i></span>';
+  st.insertBefore(bar,st.firstChild);
+});
 var slides=[].slice.call(document.querySelectorAll('#deck .slide'));
 var N=slides.length, idx=0, timer=null;
 var CATNAMES={smap:'场景总览 · 22 大场景',p1:'★ 领导重点关注',p2:'★ 领导重点关注',p3:'办文 · 公文写作与审校',p4:'办文 · 公文写作与审校',p5:'办文 · 公文写作与审校',p6:'办文 · 公文写作与审校',p7:'办文 · 公文写作与审校',p8:'办会 · 会议组织与纪要',p9:'办会 · 会议组织与纪要',p10:'办会 · 会议组织与纪要',p11:'办事 · 政务服务与日常事务',p12:'办事 · 政务服务与日常事务',p13:'办事 · 政务服务与日常事务',p14:'办事 · 政务服务与日常事务',p15:'办事 · 政务服务与日常事务',p16:'办事 · 政务服务与日常事务',p17:'办事 · 政务服务与日常事务',p18:'决策支撑 · 信息研判',p19:'决策支撑 · 信息研判',p20:'决策支撑 · 信息研判',p21:'学习培训 · 能力提升',p22:'学习培训 · 能力提升',pcase:'真实案例 · 各地实践',pfeat:'TeleAgent 政务特点',pplan:'落地建议 · 两步走',ssend:'开场 · 宁德数智公务员'};
