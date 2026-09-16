@@ -11,7 +11,7 @@
     --line:rgba(255,255,255,.14); --txt:#f2f3f8; --sub:#a8aed0; --dim:#6b7199; --ok:#37d67a; --warn:#ffb547;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden;background:var(--bg);
+  html,body{height:100%;overflow:hidden;background:var(--bg);user-select:none;-webkit-user-select:none;
     font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--txt)}
   body{position:fixed;inset:0}
   body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -775,16 +775,18 @@
   </section>
 
   <!-- 五大特点 -->
-  <section class="slide" id="pfeat" data-dwell="12">
-    <div class="cat-tag">TeleAgent · 政务突出特点</div>
+  <section class="slide" id="pfeat" data-dwell="14">
+    <div class="cat-tag">TeleAgent · 政务六大突出特点</div>
     <h2 class="title" style="font-size:2.4vw">为什么适合<em>政务场景</em></h2>
-    <div class="feats" style="margin-top:2vh">
+    <div class="feats" style="margin-top:2vh;grid-template-columns:repeat(3,1fr)">
       <div class="feat fade1"><div class="ic">🔒</div><div><h5>本地化处理 · 数据不出内网</h5><p>敏感文件、内部数据在本地完成处理，满足涉密合规要求</p></div></div>
       <div class="feat fade2"><div class="ic">🧠</div><div><h5>长期记忆 · 越用越贴合</h5><p>持续熟悉本单位文风、业务背景与历史文件</p></div></div>
       <div class="feat fade3"><div class="ic">⏰</div><div><h5>定时任务 · 无需值守</h5><p>日报、舆情、催报、提醒自动定时执行</p></div></div>
-      <div class="feat fade4"><div class="ic">🗂</div><div><h5>文档全家桶 · 一套搞定</h5><p>公文、Excel、PPT、PDF、图片无需切换多个工具</p></div></div>
-      <div class="feat fade4"><div class="ic">🏠</div><div><h5>可私有化部署 · 适配底座</h5><p>支持内网部署，适配政务大模型底座，可集成既有系统</p></div></div>
+      <div class="feat fade2"><div class="ic">🗂</div><div><h5>文档全家桶 · 一套搞定</h5><p>公文、Excel、PPT、PDF、图片无需切换多个工具</p></div></div>
+      <div class="feat fade3"><div class="ic">🏠</div><div><h5>可私有化部署 · 适配底座</h5><p>支持内网部署，适配政务大模型底座，可集成既有系统</p></div></div>
+      <div class="feat fade4"><div class="ic">🧩</div><div><h5>技能共建共享 · 越用越聪明</h5><p>一句话创建技能、使用中自动进化、一键分享同事，经验沉淀为单位能力资产</p></div></div>
     </div>
+    <p class="desc fade4" style="text-align:center;margin-top:2.6vh">公文模板、办事流程、汇报风格……一切经验都能变成技能，传下去、复用起来</p>
   </section>
 
   <!-- 落地建议 -->
@@ -896,6 +898,9 @@ function play(n){
   next.classList.add('on');
   idx=n;
   var dwell=(parseInt(next.getAttribute('data-dwell'),10)||10)*1000;
+  paused=false;
+  if(typeof pauseTip!=='undefined'&&pauseTip)pauseTip.style.display='none';
+  pageStart=Date.now();pageDwell=dwell;
   document.getElementById('pno').textContent=(n+1)+'/'+N;
   document.getElementById('catLabel').textContent=CATNAMES[next.id]||'';
   document.getElementById('seq').textContent=SEQN[next.id]||'';
@@ -930,14 +935,39 @@ function tickClock(){
   document.getElementById('cdate').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日 '+wd;
 }
 setInterval(tickClock,1000); tickClock();
-/* 键盘备用控制 + 点击全屏 */
-document.addEventListener('keydown',function(e){
-  if(e.key==='ArrowRight')play(idx+1>=N?0:idx+1);
-  if(e.key==='ArrowLeft')play(idx-1<0?N-1:idx-1);
+/* 交互：单击/空格 暂停继续；双击 全屏；←/→ 翻页 */
+var paused=false,pageStart=0,pageDwell=0,remainMs=0;
+var pauseTip=document.createElement('div');
+pauseTip.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99;background:rgba(7,9,26,.88);border:1px solid rgba(230,0,18,.5);border-radius:1vw;padding:1.8vh 2.4vw;font-size:1.3vw;color:#ffb3ba;letter-spacing:.3vw;display:none;backdrop-filter:blur(8px)';
+pauseTip.textContent='⏸ 已暂停 · 单击或空格继续';
+document.body.appendChild(pauseTip);
+function togglePause(){
+  var pf=document.getElementById('pfill');
+  if(!paused){
+    paused=true;
+    remainMs=Math.max(200,pageStart+pageDwell-Date.now());
+    if(timer){clearTimeout(timer);timer=null;}
+    var w=getComputedStyle(pf).width;
+    pf.style.transition='none';pf.style.width=w;
+    pauseTip.style.display='block';
+  }else{
+    paused=false;
+    pauseTip.style.display='none';
+    pageStart=Date.now();pageDwell=remainMs;
+    pf.style.transition='width '+remainMs+'ms linear';pf.style.width='100%';
+    timer=setTimeout(function(){play(idx+1>=N?0:idx+1);},remainMs);
+  }
+}
+document.addEventListener('click',function(){togglePause();});
+document.addEventListener('dblclick',function(e){
+  e.preventDefault();
+  if(document.fullscreenElement){document.exitFullscreen();}
+  else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(function(){});}
 });
-document.addEventListener('click',function(){
-  var el=document.documentElement;
-  if(el.requestFullscreen&&!document.fullscreenElement){el.requestFullscreen().catch(function(){});}
+document.addEventListener('keydown',function(e){
+  if(e.code==='Space'){e.preventDefault();togglePause();}
+  if(e.key==='ArrowRight'){play(idx+1>=N?0:idx+1);}
+  if(e.key==='ArrowLeft'){play(idx-1<0?N-1:idx-1);}
 });
 play(0);
 /* hash 直达指定页（便于验证与定位） */
