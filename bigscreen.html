@@ -16,8 +16,8 @@
   body{position:fixed;inset:0}
   body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     background:
-      radial-gradient(1200px 600px at 12% -12%, rgba(230,0,18,.3), transparent 60%),
-      radial-gradient(1000px 520px at 105% 45%, rgba(230,0,18,.14), transparent 60%),
+      radial-gradient(1200px 600px at 12% -12%, rgba(230,0,18,.1), transparent 60%),
+      radial-gradient(1000px 520px at 105% 45%, rgba(230,0,18,.05), transparent 60%),
       linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
     background-size:auto,auto,64px 64px,64px 64px}
@@ -29,11 +29,11 @@
   .slide.on{opacity:1;visibility:visible;transform:none}
   /* 顶部栏 */
   #topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;
-    justify-content:space-between;padding:2.4vh 4.5vw 0;pointer-events:none}
+    padding:2.4vh 4.5vw 0;pointer-events:none}
   #topbar .logo{font-size:1.05vw;letter-spacing:.5vw;color:#fff;font-weight:600;
     background:linear-gradient(90deg,var(--red),#ff4a56);padding:.5vw 1.1vw;border-radius:.4vw;white-space:nowrap}
   #topbar .mid{display:none;font-size:1.1vw;color:var(--dim);letter-spacing:.4vw;white-space:nowrap}
-  #topbar .right{display:flex;align-items:center;gap:1.6vw;white-space:nowrap}
+  #topbar .right{display:flex;align-items:center;gap:1.6vw;white-space:nowrap;margin-left:auto}
   #topbar .clock{font-size:1.5vw;color:var(--txt);font-family:Georgia,serif;letter-spacing:.2vw}
   #topbar .clock small{display:block;font-size:.85vw;color:var(--dim);letter-spacing:.3vw;font-family:"PingFang SC","Microsoft YaHei",sans-serif;text-align:right}
   #topbar .pno{font-size:1.1vw;color:var(--sub)}
