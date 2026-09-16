@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>宁德数智公务员超级智能体概念设计</title>
+<style>
+  :root{
+    --red:#E60012; --red-deep:#8f0f1c; --red-soft:#ff3b4a;
+    --bg:#0a0c1e; --bg2:#12142e; --card:rgba(255,255,255,.055);
+    --card2:rgba(255,255,255,.09); --line:rgba(255,255,255,.14);
+    --txt:#f2f3f8; --sub:#9aa0c0; --dim:#6b7199; --ok:#37d67a; --warn:#ffb547;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;background:var(--bg);
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;color:var(--txt)}
+  body{position:fixed;inset:0;touch-action:pan-y}
+  /* 背景网格与红光 */
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(230,0,18,.28), transparent 60%),
+      radial-gradient(700px 460px at 110% 30%, rgba(230,0,18,.16), transparent 60%),
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:auto,auto,46px 46px,46px 46px;
+  }
+  #deck{position:relative;z-index:1;width:100%;height:100%}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;
+    padding:calc(env(safe-area-inset-top,0px) + 56px) 18px calc(env(safe-area-inset-bottom,0px) + 64px);
+    opacity:0;visibility:hidden;transform:translateX(46px);
+    transition:opacity .5s ease,transform .5s ease,visibility .5s;
+    overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+    min-width:0;min-height:0}
+  .slide>*{max-width:100%}
+  .slide::-webkit-scrollbar{display:none}
+  .slide.on{opacity:1;visibility:visible;transform:none}
+  .slide.left{transform:translateX(-46px)}
+  /* 顶部状态条 */
+  #topbar{position:fixed;top:0;left:0;right:0;z-index:50;padding:calc(env(safe-area-inset-top,0px) + 8px) 14px 6px;
+    display:flex;align-items:center;gap:10px;pointer-events:none}
+  #topbar .logo{14;letter-spacing:2px;color:#fff;font-weight:600;
+    background:linear-gradient(90deg,var(--red),#ff4a56);padding:4px 10px;border-radius:4px;white-space:nowrap}
+  #topbar .pbar{flex:1;height:3px;background:rgba(255,255,255,.14);border-radius:2px;overflow:hidden}
+  #topbar .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),#ff6a75);border-radius:2px;transition:width .45s ease}
+  #topbar .page-no{13;color:var(--sub);white-space:nowrap;min-width:38px;text-align:right}
+  /* 底部 */
+  #bottombar{position:fixed;bottom:0;left:0;right:0;z-index:30;
+    padding:0 18px calc(env(safe-area-inset-bottom,0px) + 10px);
+    display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+  #bottombar .cats{display:flex;gap:5px}
+  #bottombar .cats i{width:14px;height:4px;border-radius:2px;background:rgba(255,255,255,.16);transition:background .3s}
+  #bottombar .cats i.on{background:var(--red)}
+  #bottombar .auto-btn{pointer-events:auto;13;color:#fff;background:rgba(230,0,18,.85);
+    border:none;border-radius:14px;padding:6px 12px;letter-spacing:1px;cursor:pointer}
+  #bottombar .auto-btn:active{transform:scale(.95)}
+  #bottombar .b-actions{display:flex;gap:6px;align-items:center;pointer-events:none}
+  #bottombar .restart-btn{pointer-events:auto;display:none;13;color:#ffb3ba;background:rgba(255,255,255,.08);
+    border:1px solid rgba(230,0,18,.5);border-radius:14px;padding:6px 12px;letter-spacing:1px;cursor:pointer}
+  #bottombar .restart-btn:active{transform:scale(.95)}
+  /* 通用排版 */
+  .cat-tag{display:inline-flex;align-items:center;gap:6px;13.5;letter-spacing:2px;
+    color:#ffb3ba;background:rgba(230,0,18,.14);border:1px solid rgba(230,0,18,.4);
+    padding:3px 10px;border-radius:14px;margin-bottom:8px}
+  .cat-tag b{color:#fff}
+  h2.title{28;font-weight:700;line-height:1.25;letter-spacing:.5px;margin-bottom:6px}
+  h2.title em{font-style:normal;color:var(--red);text-shadow:0 0 18px rgba(230,0,18,.5)}
+  .no-badge{font-family:Georgia,serif;44;font-weight:700;color:transparent;
+    -webkit-text-stroke:1px rgba(255,255,255,.22);position:absolute;right:8px;top:-2px;line-height:1}
+  .desc{16.5;color:var(--sub);line-height:1.7;margin-top:10px}
+  .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag-row span{13;color:var(--txt);background:var(--card);border:1px solid var(--line);
+    padding:2px 8px;border-radius:10px}
+  .tag-row .hot{color:#fff;background:rgba(230,0,18,.85);border-color:transparent}
+  /* 舞台(动画演示区) */
+  .stage{position:relative;flex:0 0 auto;min-height:150px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;overflow:hidden}
+  .stage .stage-title{13.5;color:var(--dim);letter-spacing:1px;margin-bottom:10px;display:flex;justify-content:space-between}
+  .stage .stage-title b{color:var(--warn);font-weight:400}
+  /* 手机聊天框 */
+  .phone{background:#0d1027;border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:11px 13px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);17}
+  .msg{max-width:86%;padding:9px 12px;border-radius:11px;margin:7px 0;line-height:1.65;opacity:0;transform:translateY(8px)}
+  .msg.me{background:linear-gradient(135deg,var(--red),#ff3b4e);color:#fff;margin-left:auto;border-bottom-right-radius:3px}
+  .msg.ai{background:rgba(255,255,255,.09);color:var(--txt);border-bottom-left-radius:3px}
+  .msg.show{opacity:1;transform:none;transition:all .45s ease}
+  .cursor{display:inline-block;width:2px;height:16px;background:var(--red-soft,#ff5b6a);vertical-align:-2px;margin-left:2px;animation:blink .8s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .src{13.5;color:var(--dim);margin-top:4px}
+  .src i{color:#59b7ff;font-style:normal}
+  /* 流程步骤 */
+  .steps{display:flex;flex-direction:column;gap:7px}
+  .steps .st{display:flex;align-items:center;gap:9px;14.5;color:var(--sub);
+    opacity:0;transform:translateX(-10px)}
+  .steps .st .dot{width:20px;height:20px;border-radius:50%;flex:0 0 20px;display:flex;align-items:center;justify-content:center;
+    12;font-weight:700;color:#fff;background:rgba(230,0,18,.35);border:1px solid rgba(230,0,18,.55)}
+  .steps .st.on{opacity:1;transform:none;transition:all .4s ease;color:var(--txt)}
+  .steps .st.on .dot{background:var(--red);box-shadow:0 0 12px rgba(230,0,18,.6)}
+  /* 公文模拟 */
+  .doc{background:#fdf8f3;color:#2b2b2b;border-radius:6px;padding:12px 14px;position:relative;
+    box-shadow:0 4px 14px rgba(0,0,0,.35);14.5;line-height:1.6}
+  .doc .redline{width:64px;height:6px;background:var(--red);border-radius:3px;margin-bottom:6px;transform:scaleX(0);transform-origin:left;transition:transform .5s .2s}
+  .doc .redline.on{transform:scaleX(1)}
+  .doc h4{16.5;color:var(--red);text-align:center;margin:4px 0 8px;font-weight:700;letter-spacing:1px}
+  .doc p{14;color:#444;text-indent:2em}
+  /* 条形图 */
+  .bars{display:flex;align-items:flex-end;gap:8px;height:90px;padding-top:6px}
+  .bars .bar{flex:1;background:linear-gradient(180deg,#ff6a7a,var(--red));border-radius:4px 4px 0 0;
+    height:0;transition:height 1s cubic-bezier(.2,.7,.3,1);position:relative;min-width:0}
+  .bars .bar.hot{background:linear-gradient(180deg,#fff,#ffd0a0)}
+  .bars .bar span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);11.5;color:var(--sub);white-space:nowrap}
+  .bars .bar i{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);11;color:var(--dim);font-style:normal;white-space:nowrap}
+  /* 推送卡片 */
+  .push{display:flex;flex-direction:column;gap:8px}
+  .push .pc{background:var(--card2);border:1px solid var(--line);border-left:3px solid var(--red);
+    border-radius:8px;padding:8px 10px;14.5;color:var(--txt);
+    opacity:0;transform:translateX(24px)}
+  .push .pc.show{opacity:1;transform:none;transition:all .45s ease}
+  .push .pc small{display:block;color:var(--dim);12.5;margin-top:3px}
+  /* 时钟 */
+  .clock{width:74px;height:74px;border-radius:50%;border:2px solid var(--red);position:relative;margin:6px auto;
+    box-shadow:0 0 18px rgba(230,0,18,.35), inset 0 0 12px rgba(230,0,18,.12)}
+  .clock::after{content:"";position:absolute;top:34px;left:34px;width:6px;height:6px;border-radius:50%;background:var(--red);transform:translate(-50%,-50%)}
+  .clock .h,.clock .m{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;background:var(--red);border-radius:2px}
+  .clock .h{width:3px;height:20px}
+  .clock .m{width:2px;height:28px}
+  /* 数字滚动 */
+  .counter-row{display:flex;gap:10px;margin-top:12px}
+  .counter-box{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+  .counter-box b{display:block;27;color:var(--red);font-family:Georgia,serif;letter-spacing:1px}
+  .counter-box span{13;color:var(--dim)}
+  /* 案例引用 */
+  .case-ref{margin-top:12px;14;color:var(--sub);background:rgba(89,183,255,.08);
+    border:1px solid rgba(89,183,255,.25);border-radius:8px;padding:7px 10px;line-height:1.55}
+  .case-ref b{color:#7cc4ff;font-weight:600}
+  /* 封面 */
+  #s0{justify-content:center;align-items:center;text-align:center;padding-bottom:60px}
+  #s0 .cover-logo{13;letter-spacing:4px;color:#ffb3ba;border:1px solid rgba(230,0,18,.5);
+    padding:4px 14px;border-radius:16px;margin-bottom:22px;opacity:0;transform:translateY(10px)}
+  #s0 .cover-title{32;font-weight:800;line-height:1.35;letter-spacing:2px;margin-bottom:14px;
+    background:linear-gradient(180deg,#fff,#ffd9dc);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #s0 .cover-sub{15;color:var(--sub);letter-spacing:3px;margin-bottom:34px}
+  #s0 .big-num{font-family:Georgia,serif;66;font-weight:700;line-height:1;
+    background:linear-gradient(180deg,#ff6a7a,var(--red));-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(230,0,18,.45)}
+  #s0 .big-label{14;color:var(--sub);letter-spacing:6px;margin-top:6px}
+  #s0 .cover-feats{display:flex;gap:8px;margin-top:30px;flex-wrap:wrap;justify-content:center;max-width:100%}
+  #s0 .cover-feats span{13;color:#d7d9ec;background:var(--card);border:1px solid var(--line);padding:4px 10px;border-radius:12px}
+  #s0 .scroll-hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);13;color:var(--dim);letter-spacing:2px;animation:bounce 1.6s infinite}
+  @keyframes bounce{50%{transform:translateY(6px)}}
+  /* 总览 */
+  .map-title{29;font-weight:800;letter-spacing:1px;margin:2px 0 2px}
+  .map-sub{15;color:var(--sub);margin-bottom:10px;letter-spacing:1px}
+  .map-group{margin-bottom:6px}
+  .map-group h4{15;color:#ffb3ba;letter-spacing:2px;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+  .map-group h4::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(230,0,18,.5),transparent)}
+  .map-items{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .map-items button{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:8px;
+    padding:7px 10px;color:var(--txt);15;cursor:pointer;position:relative;overflow:hidden}
+  .map-items button:active{transform:scale(.97)}
+  .map-items button small{display:block;color:var(--dim);13;margin-top:2px}
+  .map-items button.map-btn-hot{background:linear-gradient(135deg,rgba(230,0,18,.32),rgba(230,0,18,.12));
+    border-color:rgba(230,0,18,.7);box-shadow:0 0 14px rgba(230,0,18,.16)}
+  .map-items button.map-btn-hot::after{content:"★";position:absolute;left:8px;top:6px;12;color:#ffb3ba}
+  .map-items button .n{position:absolute;right:8px;top:5px;14;color:rgba(255,255,255,.5);font-family:Georgia,serif}
+  /* 案例卡片 */
+  .case-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px}
+  .case-card h4{16;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .case-card .k{12;color:#fff;background:var(--red);padding:1px 7px;border-radius:9px;letter-spacing:1px;flex:0 0 auto}
+  .case-card .meta{12.5;color:var(--dim);margin-bottom:6px}
+  .case-card ul{list-style:none;14.5;color:var(--sub);line-height:1.7}
+  .case-card ul li::before{content:"▸ ";color:var(--red)}
+  /* 特点 */
+  .feat{display:flex;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px;margin-top:9px;align-items:flex-start}
+  .feat .ic{flex:0 0 34px;width:34px;height:34px;border-radius:9px;background:rgba(230,0,18,.16);
+    display:flex;align-items:center;justify-content:center;18;border:1px solid rgba(230,0,18,.35)}
+  .feat h5{16;margin-bottom:2px}
+  .feat p{14;color:var(--sub);line-height:1.5}
+  /* 落地建议 */
+  .phase{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:10px;padding:11px 13px;margin-top:10px}
+  .phase h5{15;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+  .phase h5 .p{12;background:var(--red);color:#fff;border-radius:8px;padding:1px 8px;letter-spacing:1px}
+  .phase ul{list-style:none;margin-top:4px}
+  .phase li{14.5;color:var(--sub);line-height:1.75}
+  .phase li::before{content:"· ";color:var(--red)}
+  /* 结尾 */
+  #send{justify-content:center;align-items:center;text-align:center}
+  #send .big{32;font-weight:800;letter-spacing:3px;margin-bottom:14px}
+  #send .small{14;color:var(--sub);letter-spacing:2px;line-height:2}
+  .end-ring{width:150px;height:150px;border-radius:50%;margin:0 auto 22px;position:relative;
+    border:1px solid rgba(230,0,18,.4);animation:pulse 2.4s infinite}
+  .end-ring::before{content:"";position:absolute;inset:14px;border-radius:50%;border:1px solid rgba(230,0,18,.55)}
+  .end-ring::after{content:"";position:absolute;inset:30px;border-radius:50%;background:radial-gradient(circle,rgba(230,0,18,.75),var(--red));animation:pulse 2.4s 1.2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 46px rgba(230,0,18,.55)}}
+  /* 通用动效 */
+  .fade1,.fade2,.fade3,.fade4{opacity:0;transform:translateY(12px)}
+  .on .fade1{opacity:1;transform:none;transition:all .55s ease .15s}
+  .on .fade2{opacity:1;transform:none;transition:all .55s ease .35s}
+  .on .fade3{opacity:1;transform:none;transition:all .55s ease .55s}
+  .on .fade4{opacity:1;transform:none;transition:all .55s ease .75s}
+  .pulse-red{animation:pulse2 2s infinite}
+  @keyframes pulseRed{50%{box-shadow:0 0 16px rgba(230,0,18,.5)}}
+  .flex1{flex:1;display:flex;align-items:center}
+</style>
+</head>
+<body>
+<div id="deck">
+
+  <!-- 封面 -->
+  <section class="slide" id="s0">
+    <div class="cover-logo">中国电信 · 星辰大模型</div>
+    <div class="cover-title">宁德数智公务员<br>超级智能体概念设计</div>
+    <div class="cover-sub">22 个政务办公场景 · 一个智能体</div>
+    <div class="big-num" data-count="22">0</div>
+    <div class="big-label">AI 使用场景</div>
+    <div class="cover-feats">
+      <span>办文 · 办会 · 办事</span><span>数据不出内网</span><span>长期记忆</span><span>定时任务</span><span>可私有化部署</span>
+    </div>
+    <div class="scroll-hint">左右滑动或点击屏幕 · 开始演示</div>
+  </section>
+
+  <!-- 总览 -->
+  <section class="slide" id="s-map" data-scroll>
+    <div class="cat-tag">SCENE MAP · 场景全景</div>
+    <h2 class="title">一个智能体，覆盖<span><em>五大板块</em></span></h2>
+    <div class="map-title">22 大办公场景</div>
+    <div class="map-group">
+      <h4>★ 领导重点关注</h4>
+      <div class="map-items">
+        <button class="map-btn-hot" data-id="s21"><span>领导咨询决策</span><span class="n">01</span></button>
+        <button class="map-btn-hot" data-id="s22"><span>政策解读</span><span class="n">02</span></button>
+      </div>
+    </div>
+    <div class="map-group">
+      <h4>一 · 办文｜公文写作与审校</h4>
+      <div class="map-items">
+        <button data-id="s1"><small>公文起草</small><b>高频刚需</b><span class="n">03</span></button>
+        <button data-id="s2"><small>公文审校</small><b>高频刚需</b><span class="n">04</span></button>
+        <button data-id="s3"><small>讲话稿 / 汇报材料</small><span class="n">05</span></button>
+        <button data-id="s4"><small>政策对比分析</small><span class="n">06</span></button>
+        <button data-id="s5"><small>政讯智能检索</small><span class="n">07</span></button>
+      </div>
+    </div>
+    <div class="map-group">
+      <h4><span>二 · 办会｜会议组织与纪要</span></h4>
+      <div class="map-items">
+        <button data-id="s6"><span>会议纪要自动生成</span><b>高频刚需</b><span class="n">08</span></button>
+        <button data-id="s7"><span>会务材料准备</span><span class="n">09</span></button>
+        <button data-id="s8"><span>会议事项督办</span><span class="n">10</span></button>
+      </div>
+    </div>
+    <div class="map-group">
+      <h4><span>三 · 办事｜政务服务与日常事务</span></h4>
+      <div class="map-items">
+        <button data-id="s9"><span>政策智能问答</span><b>数据不出内网</b><span class="n">11</span></button>
+        <button data-id="s10"><span>工单拟答复</span><span class="n">12</span></button>
+        <button data-id="s11"><span>数据报送与统计</span><span class="n">13</span></button>
+        <button data-id="s12"><span>台账整理与报表</span><span class="n">14</span></button>
+        <button data-id="s13"><span>任务提醒·定时报送</span><b>定时任务</b><span class="n">15</span></button>
+        <button data-id="s14"><span>格式转换与翻译</span><span class="n">16</span></button>
+        <button data-id="s15"><span>办事指南优化</span><span class="n">17</span></button>
+      </div>
+    </div>
+    <div class="map-group">
+      <h4><span>四 · 决策支撑｜信息研判</span></h4>
+      <div class="map-items">
+        <button data-id="s16"><span>舆情监测·每日简报</span><span class="n">18</span></button>
+        <button data-id="s17"><span>数据分析与报告</span><span class="n">19</span></button>
+        <button data-id="s18"><span>调研与汇报材料</span><span class="n">20</span></button>
+      </div>
+    </div>
+    <div class="map-group">
+      <h4><span>五 · 学习培训｜能力提升</span></h4>
+      <div class="map-items">
+        <button data-id="s19"><span>政策学习助手</span><span class="n">21</span></button>
+        <button data-id="s20"><span>数字素养与 AI 培训</span><span class="n">22</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 21 领导咨询决策 -->
+  <section class="slide" id="s21">
+    <div class="no-badge">01</div>
+    <div class="cat-tag">领导重点关注 <b>01 / 22</b></div>
+    <h2 class="title">领导咨询决策</h2>
+    <div class="tag-row"><span class="hot">★ 领导重点关注</span><span>秒回研判</span><span>有依据可溯源</span></div>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>领导问 · 智能体答</b></div>
+      <div class="phone">
+        <div class="msg me">本季度重点项目完成率如何？有没有风险？</div>
+        <div class="msg ai"><span class="tw" data-txt="完成率 92%，较上季度提升 8 个百分点。风险提示：2 个项目进度滞后约 15%，主要因资金拨付延迟，建议本周召开专题调度会。"></span></div>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="10">0</b><span>秒内输出研判</span></div>
+        <div class="counter-box"><b>风险预警</b><span>问题+建议一并给出</span></div>
+      </div>
+    </div>
+    <p class="desc">领导一句话咨询，智能体基于内网数据秒级研判：现状、趋势、风险与对策，决策有据可依。</p>
+    <div class="case-ref"><b>真实案例 · 青岛金宏办公智能体</b>：“一句话生成分析报告”直接产出分析报告初稿，辅助领导研判决策。</div>
+  </section>
+
+  <!-- 22 政策解读 -->
+  <section class="slide" id="s22">
+    <div class="no-badge">02</div>
+    <div class="cat-tag">领导重点关注 <b>02 / 22</b></div>
+    <h2 class="title">政策解读</h2>
+    <div class="tag-row"><span class="hot">★ 领导重点关注</span><span>一屏读懂</span><span>要点+变化+影响</span></div>
+    <div class="stage">
+      <div class="stage-title">模拟 · 新政一屏解读</div>
+      <div class="steps">
+        <div class="st"><span class="dot">1</span>核心要点：五大举措提炼成 3 条</div>
+        <div class="st"><span class="dot">2</span>主要变化：与旧版对比，调整 6 处</div>
+        <div class="st"><span class="dot">3</span>本地影响：涉及领域与惠及范围</div>
+      </div>
+      <div class="phone" style="margin-top:8px">
+        <div class="msg me">这份新政对我市影响大吗？</div>
+        <div class="msg ai"><span class="tw" data-txt="影响评估：涉及制造业、外贸两个领域，预计惠及我市企业 300 余家；建议先行试点并配套市级实施细则。"></span></div>
+      </div>
+    </div>
+    <p class="desc">重要政策“一屏读懂”：核心要点、主要变化、本地影响、应对建议，领导开会、审阅、批示更高效。</p>
+    <div class="case-ref"><b>落地参考</b>：青岛金宏“政策对比”+ 银川“政策问答”同源能力，面向领导定向增强。</div>
+  </section>
+
+  <!-- 场景01 公文起草 -->
+  <section class="slide" id="s1">
+    <div class="no-badge">03</div>
+    <div class="cat-tag">办文 · 公文写作与审校 <b>03 / 22</b></div>
+    <h2 class="title">公文起草</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>AI 3 分钟成稿</b></div>
+      <div class="doc">
+        <div class="redline"></div>
+        <h4>关于采购办公设备的请示</h4>
+        <p class="tw" data-txt="根据工作需要，我局现有办公设备老化严重，影响日常办公效率。现拟采购台式计算机20台、打印机3台，预算金额40万元，资金来源为部门年度预算。妥否，请批示。"></p>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="3">0</b><span>分钟完成初稿</span></div>
+        <div class="counter-box"><b>红头模板</b><span>单位格式自动套用</span></div>
+      </div>
+    </div>
+    <p class="desc">按单位公文模板（红头、字号、排版规范）自动起草请示、报告、通知、函、批复，公务员只需补充素材、审核修改。</p>
+    <div class="case-ref"><b>真实案例 · 青岛金宏办公智能体</b>：按公文体例自动起草初稿，输出规范、符合公文格式要求，2026年5月上线。</div>
+  </section>
+
+  <!-- 场景02 公文审校 -->
+  <section class="slide" id="s2">
+    <div class="no-badge">04</div>
+    <div class="cat-tag">办文 · 公文写作与审校 <b>04 / 22</b></div>
+    <h2 class="title">公文审校</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>秒级审校 · 标注即改</b></div>
+      <div class="doc">
+        <p>根据上级部门工作<b style="color:#E60012;text-decoration:line-through">布署</b><b style="color:#16a34a">部署</b>要求，现将有关事项通知如下，请结合实际<b style="color:#E60012;text-decoration:line-through">认真仞真</b><b style="color:#16a34a">认真</b>贯彻落实。</p>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="4">0</b><span>处错别字自动标注</span></div>
+        <div class="counter-box"><b>GB/T 9704</b><span>格式规范自动核对</span></div>
+      </div>
+    </div>
+    <p class="desc">秒级检查错别字、标点、公文格式规范（GB/T 9704）、敏感表述、数据口径一致性，减少反复送审修改。</p>
+    <div class="case-ref"><b>真实案例 · 金山 WPS 365 政务版</b>：2026年8月集中展示公文起草、智能审校等政务办公全场景 AI 能力。</div>
+  </section>
+
+  <!-- 场景03 领导讲话稿 -->
+  <section class="slide" id="s3">
+    <div class="no-badge">05</div>
+    <div class="cat-tag">办文 · 公文写作与审校 <b>05 / 22</b></div>
+    <h2 class="title">领导讲话稿 / 汇报材料</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>素材一键成稿</b></div>
+      <div class="push">
+        <div class="pc">📊 上半年经营数据汇总 <small>部门素材</small></div>
+        <div class="pc">🚀 重点项目进展专报 <small>部门素材</small></div>
+        <div class="pc">📋 近期会议纪要整理 <small>部门素材</small></div>
+      </div>
+      <div class="phone" style="margin-top:8px">
+        <div class="msg ai"><span class="tw" data-txt="同志们，今年以来，我们在重点项目建设上取得了阶段性突破，各项指标稳中有进……（讲话稿已按单位文风自动成稿，可直接审阅）"></span></div>
+      </div>
+    </div>
+    <p class="desc">基于部门素材与数据生成讲话稿、汇报提纲、工作总结，自动套用本单位文风和固定表述习惯。</p>
+    <div class="case-ref"><b>落地参考</b>：青岛金宏办公平台已有材料改写、汇报材料生成等办文环节能力，配套“收发文、签批”全程网上办理。</div>
+  </section>
+
+  <!-- 场景04 政策对比分析 -->
+  <section class="slide" id="s4">
+    <div class="no-badge">06</div>
+    <div class="cat-tag">办文 · 公文写作与审校 <b>06 / 22</b></div>
+    <h2 class="title">政策对比分析</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>新旧政策逐条比对</b></div>
+      <div class="bars" style="height:86px">
+        <div class="bar hot" data-h="62%"><span>取消</span><i>旧政策</i></div>
+        <div class="bar" data-h="38%"><span>新增</span><i>新政策</i></div>
+      </div>
+      <div class="push" style="margin-top:8px">
+        <div class="pc">✔ 申报流程：三审制 → 一网通办</div>
+        <div class="pc">✔ 补贴标准：上限提高 20%</div>
+        <div class="pc">✔ 新增：信用承诺替代前置证明</div>
+      </div>
+    </div>
+    <p class="desc">新旧政策逐条对比，自动标出修改点、变化趋势，生成对比说明，用于政策解读与培训。</p>
+    <div class="case-ref"><b>真实案例 · 青岛金宏办公智能体</b>：新旧政策文件逐条比对，自动标出差异与变化点。</div>
+  </section>
+
+  <!-- 场景05 政讯智能检索 -->
+  <section class="slide" id="s5">
+    <div class="no-badge">07</div>
+    <div class="cat-tag">办文 · 公文写作与审校 <b>07 / 22</b></div>
+    <h2 class="title">政讯智能检索</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>一句话直达原文</b></div>
+      <div class="phone">
+        <div class="msg me">查一下优化营商环境的上级最新文件</div>
+        <div class="msg ai"><span class="tw" data-txt="为您检索到 3 条结果：①《关于进一步优化营商环境的若干措施》（国办发〔2024〕XX号）…已直达原文，可一键打开。"></span></div>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="3">0</b><span>秒内返回结果</span></div>
+        <div class="counter-box"><b>直达原文</b><span>无需翻找文件夹</span></div>
+      </div>
+    </div>
+    <p class="desc">政策法规、上级文件、本地要闻一句话检索直达原文，替代翻找文件夹和搜索引擎大海捞针。</p>
+    <div class="case-ref"><b>真实案例 · 青岛金宏办公智能体</b>：政讯智搜，一句话检索政策、法规、本地政讯直达原文。</div>
+  </section>
+
+  <!-- 场景06 会议纪要自动生成 -->
+  <section class="slide" id="s6">
+    <div class="no-badge">08</div>
+    <div class="cat-tag">办会 · 会议组织与纪要 <b>08 / 22</b></div>
+    <h2 class="title">会议纪要自动生成</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>录音 → 结构化纪要</b></div>
+      <div class="bars" style="height:40px;gap:3px;padding-top:2px">
+        <div class="bar" data-h="14px"></div><div class="bar" data-h="26px"></div><div class="bar" data-h="10px"></div>
+        <div class="bar" data-h="32px"></div><div class="bar" data-h="18px"></div><div class="bar" data-h="38px"></div>
+        <div class="bar" data-h="22px"></div><div class="bar" data-h="30px"></div><div class="bar" data-h="12px"></div>
+      </div>
+      <div class="steps" style="margin-top:10px">
+        <div class="st"><span class="dot">1</span>议题：研究营商环境优化工作</div>
+        <div class="st"><span class="dot">2</span>决议：成立专项工作专班</div>
+        <div class="st"><span class="dot">3</span>分工：责任部门限时 7 日内报送</div>
+      </div>
+    </div>
+    <p class="desc">会议录音/文字记录一键整理成结构化纪要：议题、发言要点、决议事项、责任分工，格式规范。</p>
+    <div class="case-ref"><b>真实案例 · 青岛金宏办公智能体</b>：会议智办，辅助会议议题、会务材料、会议纪要组织。</div>
+  </section>
+
+  <!-- 场景07 会务材料准备 -->
+  <section class="slide" id="s7">
+    <div class="no-badge">09</div>
+    <div class="cat-tag">办会 · 会议组织与纪要 <b>09 / 22</b></div>
+    <h2 class="title">会务材料准备</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>一键生成全套会务材料</b></div>
+      <div class="push">
+        <div class="pc">📄 会议通知 <small>会议时间·地点·议程</small></div>
+        <div class="pc">📋 会议议程 <small>议题与时间分配</small></div>
+        <div class="pc">🎤 主持稿 <small>开场·过渡·总结</small></div>
+        <div class="pc">📑 议题材料汇编 <small>材料自动归集排版</small></div>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="5">0</b><span>分钟备齐材料</span></div>
+        <div class="counter-box"><b>数小时→5分</b><span>会前准备耗时</span></div>
+      </div>
+    </div>
+    <p class="desc">自动生成会议通知、议程、主持稿、议题材料汇编，会前准备从数小时压缩到几分钟。</p>
+    <div class="case-ref"><b>落地参考</b>：青岛金宏办公智能体“会议智办”覆盖会务组织全流程，配合线上签批流转。</div>
+  </section>
+
+  <!-- 08 会议事项督办 -->
+  <section class="slide" id="s8">
+    <div class="no-badge">10</div>
+    <div class="cat-tag">办会 · 会议组织与纪要 <b>10 / 22</b></div>
+    <h2 class="title">会议事项督办</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>决议自动拆解 · 到期催办</b></div>
+      <div class="steps">
+        <div class="st"><span class="dot">1</span>事项：修订办事指南 → 责任科室：政务科</div>
+        <div class="st"><span class="dot">2</span>事项：数据接口联调 → 责任科室：大数据科</div>
+        <div class="st"><span class="dot">3</span>事项：窗口人员培训 → 责任科室：人事科</div>
+      </div>
+      <div class="push" style="margin-top:8px">
+        <div class="pc">⏰ 自动提醒：政务科任务 3 日内到期，请及时反馈进展</div>
+        <div class="pc">✅ 闭环跟踪：本周 2 项已完成、1 项推进中</div>
+      </div>
+    </div>
+    <p class="desc">会议决议自动拆解为任务清单（事项、责任科室、时限），到期自动提醒催办，闭环跟踪。</p>
+    <div class="case-ref"><b>落地参考</b>：青岛金宏办公平台原生具备督查督办功能，与智能体结合实现决议自动拆解、全程网上办理。</div>
+  </section>
+
+  <!-- 09 政策智能问答 -->
+  <section class="slide" id="s9">
+    <div class="no-badge">11</div>
+    <div class="cat-tag">办事 · 政务服务与日常事务 <b>11 / 22</b></div>
+    <h2 class="title">政策智能问答</h2>
+    <div class="stage">
+      <div class="stage-title">模拟演示 <b>有依据、可溯源的问答</b></div>
+      <div class="phone">
+        <div class="msg me">申领社保补贴需要哪些材料？</div>
+        <div class="msg ai"><span class="tw" data-txt="根据《就业补助资金管理办法》第 XX 条：①身份证复印件 ②就业登记证明 ③补贴申请表……"></span>
+          <div class="src">依据：《就业补助资金管理办法》第 XX 条 · <i>出处可溯源</i></div>
+        </div>
+      </div>
+      <div class="tag-row"><span class="hot">数据不出内网</span><span>答案有依据</span><span>可溯源</span></div>
+    </div>
+    <p class="desc">对接单位政策库、制度库、历史文件，工作人员和群众咨询直接问答，数据全程不出内网。</p>
+    <div class="case-ref"><b>真实案例 · 银川“银小服”</b>：整合市本级 1230 余项政务服务事项，自然对话完成咨询、预约、申报、查询（2026年3月上线）。</div>
+  </section>
+
+  <!-- 10 工单拟答复 -->
+  <section class="slide" id="s10">
+    <div class="no-badge">12</div>
+    <div class="cat-tag">办事 · 政务服务与日常事务 <b>12 / 22</b></div>
+    <h2 class="title">12345 / 信访工单拟答复</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 工单智能拟答</div>
+      <div class="phone">
+        <div class="msg me">【12345 工单】反映：XX路路灯夜间不亮，存在安全隐患</div>
+        <div class="msg ai"><span class="tw" data-txt="已核实：该路段因线路故障导致路灯不亮，已列入本周维修计划，预计 3 个工作日内恢复。感谢您的反映！"></span></div>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="10">0</b><span>秒生成答复初稿</span></div>
+        <div class="counter-box"><b>口径一致</b><span>按历史办理口径</span></div>
+      </div>
+    </div>
+    <p class="desc">按历史办理口径和政策依据自动草拟答复意见，标准化、快回复，减轻基层接单压力。</p>
+    <div class="case-ref"><b>落地参考</b>：银川“智能问效”已实现办理效果全程跟踪评估，与工单答复场景天然衔接。</div>
+  </section>
+
+  <!-- 11 数据报送与统计 -->
+  <section class="slide" id="s11">
+    <div class="no-badge">13</div>
+    <div class="cat-tag">办事 · 政务服务与日常事务 <b>13 / 22</b></div>
+    <h2 class="title">数据报送与统计</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 台账自动汇总 · 一致性校核</div>
+      <div class="push">
+        <div class="pc">📊 各乡镇台账（12 份）<small>Excel 数据源</small></div>
+        <div class="pc">🔁 自动汇总生成报送表 <small>合并·去重·按口径归集</small></div>
+        <div class="pc">✅ 一致性校验通过 <small>合计与明细自动核对</small></div>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="12">0</b><span>份台账自动合并</span></div>
+        <div class="counter-box"><b data-count="0">0</b><span>处手工核对</span></div>
+      </div>
+    </div>
+    <p class="desc">从 Excel 台账、业务系统中自动汇总生成报送表格，自动校核数据一致性，减少手工核对。</p>
+    <div class="case-ref"><b>真实案例 · 金山 WPS 365 政务版</b>：集中展示数据报送等政务办公全场景 AI 能力（2026年8月）。</div>
+  </section>
+
+  <!-- 12 台账整理与报表 -->
+  <section class="slide" id="s12">
+    <div class="no-badge">14</div>
+    <div class="cat-tag">办事 · 政务服务与日常事务 <b>14 / 22</b></div>
+    <h2 class="title">台账整理与报表</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 一键出周报/月报/PPT</div>
+      <div class="steps">
+        <div class="st"><span class="dot">1</span>分类归并：项目·财务·人事台账</div>
+        <div class="st"><span class="dot">2</span>生成周报 / 月报 / 报表</div>
+        <div class="st"><span class="dot">3</span>一键导出 Excel / PPT 分析成果</div>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="10">0</b><span>分钟出周报初稿</span></div>
+        <div class="counter-box"><b>多格式</b><span>Excel/PPT 自由切换</span></div>
+      </div>
+    </div>
+    <p class="desc">分类归并各类台账，自动生成周报、月报、报表，一键出 Excel / PPT 分析成果。</p>
+    <div class="case-ref"><b>真实案例 · 金山 WPS 365 政务版</b>：数据报送、台账报表等政务办公场景已有成熟 AI 能力展示。</div>
+  </section>
+
+  <!-- 13 任务提醒与定时报送 -->
+  <section class="slide" id="s13">
+    <div class="no-badge">15</div>
+    <div class="cat-tag">办事 · 政务服务与日常事务 <b>15 / 22</b></div>
+    <h2 class="title">任务提醒与定时报送</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 到点自动推送</div>
+      <div class="clock">
+        <div class="h"></div><div class="m"></div>
+      </div>
+      <div class="push" style="margin-top:8px">
+        <div class="pc">07:30 日报已自动生成并推送 <small>每日定时任务</small></div>
+        <div class="pc">08:00 舆情简报已送达 <small>自动抓取聚合</small></div>
+        <div class="pc">15:00 报送提醒：3 项任务今日到期 <small>不遗漏</small></div>
+      </div>
+    </div>
+    <p class="desc">设置定时任务，每日自动汇总工作进展、生成日报舆情简报，到点推送提醒，不遗漏。</p>
+    <div class="case-ref"><b>产品亮点</b>：TeleAgent 原生支持定时任务，日报、舆情、催报、提醒自动定时执行，无需人工值守。</div>
+  </section>
+
+  <!-- 14 文档格式转换与翻译 -->
+  <section class="slide" id="s14">
+    <div class="no-badge">16</div>
+    <div class="cat-tag">办事 · 政务服务与日常事务 <b>16 / 22</b></div>
+    <h2 class="title">文档格式转换与翻译</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · PDF/图片 → 文字 → 多语种</div>
+      <div class="steps">
+        <div class="st"><span class="dot">1</span>PDF / 图片扫描件 → 可编辑文字</div>
+        <div class="st"><span class="dot">2</span>Word / Excel / PPT 格式互转</div>
+        <div class="st"><span class="dot">3</span>多语种翻译 · 服务外事接待</div>
+      </div>
+      <div class="phone" style="margin-top:8px">
+        <div class="msg ai"><span class="tw" data-txt="原文（EN）→ 中文译文：欢迎贵方代表团访问我市，就智慧城市合作开展深入交流。"></span></div>
+      </div>
+    </div>
+    <p class="desc">PDF / 图片转文字、格式转换、多语种翻译，服务外事接待、材料互转等日常事务。</p>
+    <div class="case-ref"><b>产品亮点</b>：文档全家桶——公文、Excel 表格、PPT、PDF、图片一套搞定，无需切换多个工具。</div>
+  </section>
+
+  <!-- 15 办事指南优化 -->
+  <section class="slide" id="s15">
+    <div class="no-badge">17</div>
+    <div class="cat-tag">办事 · 政务服务与日常事务 <b>17 / 22</b></div>
+    <h2 class="title">办事指南优化</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 政策原文 → 通俗版指南</div>
+      <div class="doc" style="13">
+        <p>政策原文：“申请人应当提交本办法规定之申请材料，并保证材料真实、完整、有效……”</p>
+      </div>
+      <div class="steps" style="margin-top:8px">
+        <div class="st"><span class="dot">1</span>带什么：身份证 + 申请表 + 证明</div>
+        <div class="st"><span class="dot">2</span>去哪办：XX 政务服务中心 3 号窗口</div>
+        <div class="st"><span class="dot">3</span>办多久：材料齐全 5 个工作日</div>
+      </div>
+    </div>
+    <p class="desc">将政策文件自动改写为通俗版办事指南（办理条件、材料、流程、时限），方便群众看懂。</p>
+    <div class="case-ref"><b>真实案例 · 银川“银小服”</b>：智能导引告诉群众“办什么、去哪办、带什么材料”，多轮对话逐步导引。</div>
+  </section>
+
+  <!-- 16 舆情监测与每日简报 -->
+  <section class="slide" id="s16">
+    <div class="no-badge">18</div>
+    <div class="cat-tag">决策支撑 · 信息研判 <b>18 / 22</b></div>
+    <h2 class="title">舆情监测与每日简报</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 定时聚合 → 简报推送</div>
+      <div class="push">
+        <div class="pc">📡 全网热点抓取（新闻·论坛·新媒体）<small>凌晨 2:00 自动聚合</small></div>
+        <div class="pc">🔥 热点摘要：本地区关键词 12 条、预警 2 条 <small>自动分级</small></div>
+        <div class="pc">📮 08:00 每日舆情简报已推送 <small>替代人工刷屏汇总</small></div>
+      </div>
+    </div>
+    <p class="desc">定时抓取、聚合相关舆情信息，自动生成每日舆情简报与热点摘要，替代人工刷屏汇总。</p>
+    <div class="case-ref"><b>产品亮点</b>：定时任务能力保障舆情简报每日自动生成推送，无需人工值守。</div>
+  </section>
+
+  <!-- 17 数据分析与报告 -->
+  <section class="slide" id="s17">
+    <div class="no-badge">19</div>
+    <div class="cat-tag">决策支撑 · 信息研判 <b>19 / 22</b></div>
+    <h2 class="title">数据分析与报告</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 一句话生成报告</div>
+      <div class="bars" style="height:86px">
+        <div class="bar" data-h="30%"><i>1月</i></div>
+        <div class="bar" data-h="52%"><i>2月</i></div>
+        <div class="bar" data-h="44%"><i>3月</i></div>
+        <div class="bar hot" data-h="88%"><i>4月</i></div>
+      </div>
+      <div class="phone" style="margin-top:8px">
+        <div class="msg ai"><span class="tw" data-txt="分析结论：4 月业务量环比增长 100%，创年内新高，主要由新政策驱动；建议重点关注 5 月趋势延续性。"></span></div>
+      </div>
+    </div>
+    <p class="desc">对业务数据一键生成分析报告（趋势、排名、异常点），“一句话生成报告”，辅助研判决策。</p>
+    <div class="case-ref"><b>真实案例 · 青岛金宏办公智能体</b>：基于需求一句话直接产出分析报告初稿。</div>
+  </section>
+
+  <!-- 18 调研与汇报材料 -->
+  <section class="slide" id="s18">
+    <div class="no-badge">20</div>
+    <div class="cat-tag">决策支撑 · 信息研判 <b>20 / 22</b></div>
+    <h2 class="title">调研与汇报材料</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 零散素材 → 汇报 PPT</div>
+      <div class="push">
+        <div class="pc">🗂 调研访谈记录（5 份）<small>零散素材</small></div>
+        <div class="pc">📑 统计数据与政策文件 <small>零散素材</small></div>
+        <div class="pc">📊 自动组织调研报告 + 汇报 PPT 初稿 <small>统一模板风格</small></div>
+      </div>
+      <div class="counter-row">
+        <div class="counter-box"><b data-count="15">0</b><span>分钟出初稿</span></div>
+        <div class="counter-box"><b>统一风格</b><span>自动套用模板</span></div>
+      </div>
+    </div>
+    <p class="desc">把零散素材自动组织成调研报告、汇报 PPT 初稿，套用统一模板风格。</p>
+    <div class="case-ref"><b>落地参考</b>：青岛金宏“一句话生成分析报告”同源能力，可扩展至调研材料组织。</div>
+  </section>
+
+  <!-- 19 政策学习助手 -->
+  <section class="slide" id="s19">
+    <div class="no-badge">21</div>
+    <div class="cat-tag">学习培训 · 能力提升 <b>21 / 22</b></div>
+    <h2 class="title">政策学习助手</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 学透一份政策</div>
+      <div class="steps">
+        <div class="st"><span class="dot">1</span>全文摘要：一页读懂政策要点</div>
+        <div class="st"><span class="dot">2</span>要点解读：关键条款通俗解释</div>
+        <div class="st"><span class="dot">3</span>新旧对比：变化一目了然</div>
+        <div class="st"><span class="dot">4</span>配套问答：随学随问</div>
+      </div>
+      <div class="phone" style="margin-top:8px">
+        <div class="msg me">这条“容缺受理”是什么意思？</div>
+        <div class="msg ai"><span class="tw" data-txt="指主要材料齐全时，可先行受理、后补材料，群众少跑一趟。对应政策第 12 条。"></span></div>
+      </div>
+    </div>
+    <p class="desc">对政策原文提供全文摘要、要点解读、新旧对比、配套问答，提升基层学习效率。</p>
+    <div class="case-ref"><b>产品亮点</b>：结合“长期记忆”，持续熟悉本单位政策库，越用越贴合。</div>
+  </section>
+
+  <!-- 20 数字素养与AI培训 -->
+  <section class="slide" id="s20">
+    <div class="no-badge">22</div>
+    <div class="cat-tag">学习培训 · 能力提升 <b>22 / 22</b></div>
+    <h2 class="title">数字素养与 AI 培训</h2>
+    <div class="stage">
+      <div class="stage-title">模拟 · 随身 AI 培训教练</div>
+      <div class="phone">
+        <div class="msg me">出一道公文写作的练习题？</div>
+        <div class="msg ai"><span class="tw" data-txt="练习：某局需向市政府申请增设便民服务窗口，请列出请示公文的核心要素（标题、主送、理由、事项、结语）。"></span></div>
+      </div>
+      <div class="push" style="margin-top:8px">
+        <div class="pc">🎯 自动出题 · 实时答疑 <small>覆盖公文/会务/数据分析</small></div>
+        <div class="pc">🖥 现场演示办公场景 <small>推动全员会用 AI</small></div>
+      </div>
+    </div>
+    <p class="desc">作为“公务员 AI 培训教练”，出题、答疑、演示办公场景，推动全员会用 AI。</p>
+    <div class="case-ref"><b>落地参考</b>：TeleAgent 自身即培训载体，培训即实战、边学边用。</div>
+  </section>
+
+  <!-- 案例总览 -->
+  <section class="slide" id="scase" data-scroll>
+    <div class="no-badge">C</div>
+    <div class="cat-tag">真实案例 · 已落地实践</div>
+    <h2 class="title">各地实践，验证<em>可复制</em></h2>
+    <div class="case-card">
+      <h4><span class="k">对内办公</span>青岛「金宏办公智能体」</h4>
+      <div class="meta">青岛市大数据局 · 2026年5月 · 市级统一政务大模型底座</div>
+      <ul>
+        <li>公文写作、政策对比、政讯智搜、全文档解析、会议智办</li>
+        <li>“一句话生成分析报告”；对接办文、办会、办事核心需求</li>
+        <li>全市已上线 90 个政务大模型应用场景</li>
+      </ul>
+    </div>
+    <div class="case-card">
+      <h4><span class="k">对外服务</span>银川「银小服」AI+政务服务</h4>
+      <div class="meta">银川市审批服务管理局 · 2026年3月 · DeepSeek + 本地政务垂域模型</div>
+      <ul>
+        <li>智能问答、智能导引、智能审批、证照查询、智能问效</li>
+        <li>整合市本级 1230 余项事项，三端同步上线</li>
+        <li>公积金提取类事项：排队复印 → 手机一键调取即办即走</li>
+      </ul>
+    </div>
+    <div class="case-card">
+      <h4><span class="k">办公平台</span>金山 WPS 365 政务版</h4>
+      <div class="meta">2026年8月 · 办公软件平台</div>
+      <ul>
+        <li>公文起草、智能审校、数据报送等政务办公全场景 AI</li>
+        <li>印证“办公全家桶”路线在政务市场成熟可用</li>
+      </ul>
+    </div>
+    <p class="desc fade1">TeleAgent 恰好内外两条线都能覆盖：对内文档/办公 + 对外问答/材料核验——一个底座、对内对外两条线。</p>
+  </section>
+
+  <!-- 五大特点 -->
+  <section class="slide" id="sfeat" data-scroll>
+    <div class="no-badge">★</div>
+    <div class="cat-tag">TeleAgent · 政务突出特点</div>
+    <h2 class="title">为什么适合<em>政务场景</em></h2>
+    <div class="feat fade1"><div class="ic">🔒</div><div><h5>本地化处理 · 数据不出内网</h5><p>敏感文件、内部数据在本地完成处理，满足涉密合规要求</p></div></div>
+    <div class="feat fade2"><div class="ic">🧠</div><div><h5>长期记忆 · 越用越贴合</h5><p>持续熟悉本单位文风、业务背景与历史文件</p></div></div>
+    <div class="feat fade3"><div class="ic">⏰</div><div><h5>定时任务 · 无需值守</h5><p>日报、舆情、催报、提醒自动定时执行</p></div></div>
+    <div class="feat fade4"><div class="ic">🗂</div><div><h5>文档全家桶 · 一套搞定</h5><p>公文、Excel、PPT、PDF、图片无需切换多个工具</p></div></div>
+    <div class="feat fade4"><div class="ic">🏠</div><div><h5>可私有化部署 · 适配底座</h5><p>支持内网部署，适配政务大模型底座，可集成既有系统</p></div></div>
+  </section>
+
+  <!-- 落地建议 -->
+  <section class="slide" id="splan" data-scroll>
+    <div class="no-badge">→</div>
+    <div class="cat-tag">落地路径 · 两步走</div>
+    <h2 class="title">建议<em>分两批</em>推进</h2>
+    <div class="phase fade1">
+      <h5><span class="p">第一批</span>高频刚需 · 见效快</h5>
+      <ul>
+        <li>公文起草</li>
+        <li>公文审校</li>
+        <li>政策智能问答</li>
+        <li>会议纪要自动生成</li>
+      </ul>
+      <p style="13;color:var(--dim);margin-top:5px">四个场景率先上线，易推广、易形成示范效应</p>
+    </div>
+    <div class="phase fade3">
+      <h5><span class="p">第二批</span>深度场景 · 规模应用</h5>
+      <ul>
+        <li>数据分析与报告</li>
+        <li>舆情监测与每日简报</li>
+        <li>任务提醒与定时报送</li>
+        <li>工单拟答复 · 台账报表</li>
+      </ul>
+      <p style="13;color:var(--dim);margin-top:5px">逐步扩展至 20 场景全覆盖</p>
+    </div>
+  </section>
+
+  <!-- 结尾 -->
+  <section class="slide" id="ssend">
+    <div class="end-ring"></div>
+    <div class="big">宁德数智公务员</div>
+    <div class="small">20 个场景 · 一个智能体<br>让公务员从繁杂事务中解放出来<br>把时间留给决策与创新</div>
+    <div class="cover-feats" style="margin-top:26px">
+      <span>办文提效</span><span>办会提速</span><span>办事提质</span>
+    </div>
+    <div class="scroll-hint" style="position:static;margin-top:40px;animation:bounce 1.6s infinite">中国电信 · 星辰大模型 · 数智公务员</div>
+  </section>
+
+</div>
+
+<div id="topbar">
+  <div class="logo">数智公务员</div>
+  <div class="pbar"><i id="pfill"></i></div>
+  <div class="page-no" id="pno">1/28</div>
+</div>
+<div id="bottombar">
+  <div class="cats" id="catdots"></div>
+  <div class="b-actions">
+    <button class="restart-btn" id="restartBtn">从头开始</button>
+    <button class="auto-btn" id="autoBtn">自动演示</button>
+  </div>
+</div>
+
+<script>
+/* ====== Deck 引擎 ====== */
+var slides=[].slice.call(document.querySelectorAll('#deck .slide'));
+var idx=0, N=slides.length;
+var CATS=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25];
+var catMap={s0:0,smap:1,s1:2,s2:2,s3:2,s4:2,s5:2,s6:3,s7:3,s8:3,s9:4,s10:4,s11:4,s12:4,s13:4,s14:4,s15:4,s16:5,s17:5,s18:5,s19:5,s20:5,s21:5,s22:5,scase:5,sfeat:5,splan:5,ssend:5};
+var catOf=function(el){var id=el.id;return catMap[id]!==undefined?catMap[id]:0;};
+var dots=document.getElementById('catdots');
+for(var i=0;i<6;i++){var d=document.createElement('i');dots.appendChild(d);}
+
+function goTo(n,dir){
+  if(n<0)n=0;if(n>=N)n=N-1;
+  var cur=slides[idx],next=slides[n];
+  if(cur&&cur!==next){
+    cur.classList.remove('on');cur.classList.add('left');
+  }
+  next.classList.remove('left');next.classList.add('on');
+  idx=n;
+  var rb=document.getElementById('restartBtn');
+  if(rb)rb.style.display=(idx===0)?'none':'inline-block';
+  document.getElementById('pfill').style.width=((n+1)/N*100)+'%';
+  document.getElementById('pno').textContent=(n+1)+'/'+N;
+  var dotsEls=dots.children;
+  for(var k=0;k<dotsEls.length;k++)dotsEls[k].className=(k===catOf(n))?'on':'';
+  var dts=next.querySelectorAll('.tw');
+  setTimeout(function(){dts.forEach(function(t){startTw(t);});},260);
+  next.querySelectorAll('[data-count]').forEach(function(el){countUp(el);});
+  next.querySelectorAll('.bars .bar').forEach(function(b){var h=b.getAttribute('data-h');if(h)b.style.height=h;});
+  setTimeout(function(){
+    next.querySelectorAll('.msg').forEach(function(m,i){setTimeout(function(){m.classList.add('show');},i*350+200);});
+    next.querySelectorAll('.push .pc').forEach(function(m,i){setTimeout(function(){m.classList.add('show');},i*380+250);});
+    next.querySelectorAll('.steps .st').forEach(function(m,i){setTimeout(function(){m.classList.add('on');},i*420+300);});
+    next.querySelectorAll('.doc .redline').forEach(function(m,i){setTimeout(function(){m.classList.add('on');},250);});
+    var bars=next.querySelectorAll('.bars');
+    if(bars.length){setTimeout(function(){bars.forEach(function(bx){bx.querySelectorAll('.bar').forEach(function(b){var h=b.getAttribute('data-h');if(h)b.style.height=h;});});},450);}
+    var clk=next.querySelector('.clock');
+    if(clk){animateClock(clk);}
+  },80);
+}
+function nextSlide(){goTo(idx+1,1)}
+function prevSlide(){goTo(idx-1,-1)}
+/* 打字机 */
+function startTw(el){
+  if(el.dataset.done)return;el.dataset.done=1;
+  var full=el.getAttribute('data-txt')||el.textContent;
+  el.textContent='';var i=0,cur=el;
+  (function tick(){
+    if(i<=full.length){
+      cur.innerHTML=full.slice(0,i)+'<span class="cursor"></span>';
+      i++;setTimeout(tick,28+Math.random()*38);
+    }
+  })();
+}
+/* 数字滚动 */
+function countUp(el){
+  if(el.dataset.done)return;el.dataset.done=1;
+  var target=parseInt(el.getAttribute('data-count'),10)||0,t=0,st=Date.now(),dur=1100;
+  (function tick(){
+    var p=Math.min(1,(Date.now()-st)/dur);
+    var v=Math.round(target*(1-Math.pow(1-p,3)));
+    el.textContent=v;
+    if(p<1)requestAnimationFrame(tick);
+  })();
+}
+/* 时钟 */
+function animateClock(el){
+  var deg=0;clearInterval(el._t);
+  el._t=setInterval(function(){deg=(deg+6)%360;
+    var h=el.querySelector('.h'),m=el.querySelector('.m');
+    if(h)h.style.transform='rotate('+(deg/12)+'deg)';
+    if(m)m.style.transform='rotate('+deg+'deg)';
+  },120);
+}
+/* 触摸滑动 */
+var tx=0,ty=0,sliding=false;
+document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;ty=e.touches[0].clientY;sliding=true;},{passive:true});
+document.addEventListener('touchend',function(e){
+  if(!sliding)return;sliding=false;
+  var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){dx<0?nextSlide():prevSlide();}
+},{passive:true});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')nextSlide();if(e.key==='ArrowLeft')prevSlide();});
+/* 点击区域翻页：左侧上翻 右侧下翻 */
+document.addEventListener('click',function(e){
+  if(e.target.closest('button'))return;
+  if(e.target.closest('.slide[data-scroll]'))return;
+  if(e.target.closest('.slide')){
+    var r=e.target.getBoundingClientRect();
+    if(e.clientX>r.left+r.width*0.5){nextSlide();}else{prevSlide();}
+  }
+});
+/* 总览跳转 */
+document.querySelectorAll('#s-map button').forEach(function(b){
+  b.addEventListener('click',function(ev){ev.stopPropagation();goTo(slides.findIndex(function(s){return s.id===b.getAttribute('data-id');}),1);});
+});
+/* 自动演示 */
+var autoTimer=null;
+document.getElementById('restartBtn').addEventListener('click',function(){goTo(0,1);});
+document.getElementById('autoBtn').addEventListener('click',function(){
+  var btn=this;
+  if(autoTimer){clearInterval(autoTimer);autoTimer=null;btn.textContent='自动演示';btn.style.background='rgba(230,0,18,.32)';
+    if(document.fullscreenElement)document.exitFullscreen();return;}
+  btn.textContent='停止演示';btn.style.background='#E60012';
+  if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(function(){});}
+  autoTimer=setInterval(function(){if(idx>=N-1){goTo(0,1);}else{nextSlide();}},4200);
+});
+goTo(0,1);
+/* hash 直达页面，便于定位演示 */
+function goHash(){var h=location.hash.replace('#','');if(h){var si=slides.findIndex(function(s){return s.id===h;});if(si>=0)goTo(si,1);}}
+window.addEventListener('hashchange',goHash);
+goHash();
+</script>
+</body>
+</html>

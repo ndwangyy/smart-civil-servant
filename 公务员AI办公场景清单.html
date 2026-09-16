@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公务员AI办公场景清单（初稿）</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background:#f5f6f8; color:#333; line-height:1.7; padding:32px 16px;
+  }
+  .page {
+    max-width: 900px; margin:0 auto; background:#fff;
+    border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,.08); padding:48px 56px;
+  }
+  h1 { font-size:26px; text-align:center; color:#E60012; margin-bottom:6px; }
+  .subtitle { text-align:center; color:#888; font-size:14px; margin-bottom:30px; }
+  h2 {
+    font-size:19px; color:#fff; background:#E60012;
+    padding:8px 16px; border-radius:4px; margin:32px 0 14px;
+  }
+  h3 { font-size:16px; color:#8f0f1c; margin:18px 0 8px; }
+  .scenario {
+    background:#fafbfc; border-left:3px solid #E60012;
+    padding:10px 14px; margin:8px 0; border-radius:0 4px 4px 0;
+  }
+  .scenario .name { font-weight:bold; color:#222; }
+  .scenario .desc { color:#555; font-size:14px; }
+  .scenario .tag {
+    display:inline-block; background:#fdeaea; color:#E60012;
+    font-size:12px; padding:1px 8px; border-radius:10px; margin-left:8px;
+  }
+  table { width:100%; border-collapse:collapse; margin:10px 0; font-size:14px; }
+  th, td { border:1px solid #e0e0e0; padding:8px 10px; text-align:left; }
+  th { background:#fdeaea; color:#8c0d18; }
+  .note { background:#fff8e6; border:1px solid #f0d48a; border-radius:6px; padding:12px 16px; font-size:14px; color:#6b5310; margin-top:20px; }
+  .case {
+    background:#fafbfc; border:1px solid #e5e5e5; border-radius:6px;
+    padding:14px 18px; margin:10px 0;
+  }
+  .case h3 { margin-top:0; border-bottom:1px solid #eee; padding-bottom:6px; }
+  .case p { font-size:14px; color:#444; margin:6px 0; }
+  .case .info { color:#888; font-size:13px; }
+  .case ul { margin:6px 0 6px 20px; font-size:14px; color:#444; }
+  .case ul li { margin:4px 0; }
+  .tag2 { color:#E60012; font-weight:bold; }
+  .footer { text-align:center; color:#aaa; font-size:12px; margin-top:36px; }
+  @media (max-width:640px){ .page{ padding:24px 16px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>公务员 AI 办公场景清单</h1>
+  <div class="subtitle">TeleAgent「数智公务员」推广素材 · 初稿（供审阅）</div>
+
+  <h2>一、办文 · 公文写作与审校</h2>
+  <div class="scenario"><span class="name">1. 公文起草</span><span class="tag">高频刚需</span>
+    <div class="desc">按单位公文模板（红头、字号、排版规范）自动起草请示、报告、通知、函、批复等初稿，公务员只需补充素材、审核修改。</div></div>
+  <div class="scenario"><span class="name">2. 公文审校</span><span class="tag">高频刚需</span>
+    <div class="desc">秒级检查错别字、标点、公文格式规范（GB/T 9704）、敏感表述、数据口径前后一致性，减少反复送审修改。</div></div>
+  <div class="scenario"><span class="name">3. 领导讲话稿 / 汇报材料</span>
+    <div class="desc">基于部门素材与数据，生成讲话稿、汇报提纲、工作总结，套用本单位文风和固定表述习惯。</div></div>
+  <div class="scenario"><span class="name">4. 政策对比分析</span>
+    <div class="desc">新旧政策文件逐条对比，自动标出修改点、变化趋势，生成对比说明，用于政策解读与培训。</div></div>
+  <div class="scenario"><span class="name">5. 政讯智能检索</span>
+    <div class="desc">政策法规、上级文件、本地要闻一句话检索直达原文，替代翻找文件夹和搜索引擎大海捞针。</div></div>
+
+  <h2>二、办会 · 会议组织与纪要</h2>
+  <div class="scenario"><span class="name">6. 会议纪要自动生成</span><span class="tag">高频刚需</span>
+    <div class="desc">会议录音/文字记录一键整理成结构化纪要：议题、发言要点、决议事项、责任分工，格式规范。</div></div>
+  <div class="scenario"><span class="name">7. 会务材料准备</span>
+    <div class="desc">自动生成会议通知、议程、主持稿、议题材料汇编，会前准备从数小时压缩到几分钟。</div></div>
+  <div class="scenario"><span class="name">8. 会议事项督办</span>
+    <div class="desc">将会议决议自动拆解为任务清单（事项、责任科室、时限），到期自动提醒催办，闭环跟踪。</div></div>
+
+  <h2>三、办事 · 政务服务与日常事务</h2>
+  <div class="scenario"><span class="name">9. 政策智能问答</span><span class="tag">数据不出内网</span>
+    <div class="desc">对接单位政策库、制度库、历史文件，工作人员和群众咨询可直接问答，答案有依据、可溯源，数据全程不出内网。</div></div>
+  <div class="scenario"><span class="name">10. 12345/信访工单拟答复</span>
+    <div class="desc">按历史办理口径和政策依据自动草拟答复意见，标准化、快回复，减轻基层接单压力。</div></div>
+  <div class="scenario"><span class="name">11. 数据报送与统计</span>
+    <div class="desc">从 Excel 台账、业务系统中自动汇总生成报送表格，自动校核数据一致性，减少手工核对。</div></div>
+  <div class="scenario"><span class="name">12. 台账整理与报表</span>
+    <div class="desc">分类归并各类台账，自动生成周报、月报、报表；一键出 Excel/PPT 分析成果。</div></div>
+  <div class="scenario"><span class="name">13. 任务提醒与定时报送</span><span class="tag">定时任务</span>
+    <div class="desc">设置定时任务，每日自动汇总前一日工作进展、生成日报舆情简报，到点推送提醒，不遗漏。</div></div>
+  <div class="scenario"><span class="name">14. 文档格式转换与翻译</span>
+    <div class="desc">PDF/图片转文字、格式转换、多语种翻译，服务外事接待、材料互转等日常事务。</div></div>
+  <div class="scenario"><span class="name">15. 办事指南优化</span>
+    <div class="desc">将政策文件自动改写为通俗版办事指南（办理条件、材料、流程、时限），方便群众看懂。</div></div>
+
+  <h2>四、决策支撑 · 信息研判</h2>
+  <div class="scenario"><span class="name">16. 舆情监测与每日简报</span>
+    <div class="desc">定时抓取、聚合相关舆情信息，自动生成每日舆情简报与热点摘要，替代人工刷屏汇总。</div></div>
+  <div class="scenario"><span class="name">17. 数据分析与报告</span>
+    <div class="desc">对业务数据一键生成分析报告（趋势、排名、异常点），"一句话生成报告"，辅助研判决策。</div></div>
+  <div class="scenario"><span class="name">18. 调研与汇报材料</span>
+    <div class="desc">把零散素材自动组织成调研报告、汇报 PPT 初稿，套用统一模板风格，统一风格。</div></div>
+
+  <h2>五、学习培训 · 能力提升</h2>
+  <div class="scenario"><span class="name">19. 政策学习助手</span>
+    <div class="desc">对政策原文提供全文摘要、要点解读、新旧对比、配套问答，提升基层学习效率。</div></div>
+  <div class="scenario"><span class="name">20. 数字素养与AI培训</span>
+    <div class="desc">作为"公务员AI培训教练"，出题、答疑、演示办公场景，推动全员会用 AI。</div></div>
+
+  <h2>参考案例（各地已落地实践）</h2>
+
+  <div class="case">
+    <h3>案例一：青岛「金宏办公智能体」—— 对内办文办会办事的"超级助手"</h3>
+    <p class="info">发布方：青岛市大数据局　|　上线时间：2026年5月　|　依托市级统一政务大模型支撑底座</p>
+    <p>定位为政务办公 AI 助手，精准对接机关 <span class="tag2">办文、办会、办事</span> 三大核心需求，面向公务员自身办公提效。</p>
+    <ul>
+      <li><b>公文写作</b>：按公文体例自动起草初稿，输出规范、符合公文格式要求；</li>
+      <li><b>政策对比</b>：新旧政策文件逐条比对，自动标出差异与变化点；</li>
+      <li><b>政讯智搜</b>：一句话检索政策、法规、本地政讯，直达原文；</li>
+      <li><b>全文档解析</b>：读取 Word、PDF、表格等多格式材料并提取要点；</li>
+      <li><b>会议智办</b>：辅助会议议题、会务材料、会议纪要组织；</li>
+      <li><b>一句话生成分析报告</b>：基于需求直接产出分析报告初稿。</li>
+    </ul>
+    <p>官方通报为"<b>10 项任务、9 大智能应用</b>"，逐项清单暂未完整公开；结合其既有"金宏办公平台"（收发文、签批、会议、领导批示、督查督办等全程网上办理），其余能力可覆盖公文流转、督查督办、材料改写等办文办会环节。</p>
+    <p class="info">底座数据：青岛已累计上线 <b>90 个</b>政务大模型应用场景，数字人服务覆盖 25 家单位，并发布 2026 年政务 AI 应用场景开放清单（<b>51 个</b>场景），采取"场景清单 + 智能体"成体系打法。</p>
+  </div>
+
+  <div class="case">
+    <h3>案例二：银川「银小服」+「人工智能+政务服务」9 大场景 —— 对外服务型</h3>
+    <p class="info">银川市审批服务管理局　| 2026年3月市民大厅试上线、3月30日正式发布</p>
+    <p>定位政务 AI 助手，聚焦企业群众办事的"找不到窗口、问不清流程、材料多核验慢"高频堵点，推动政务服务从"能办"迈向"好办、智办"。技术为 <b>DeepSeek 大模型 + 本地化"希言"政务垂域模型</b>，整合市本级 <b>1230 余项</b>政务服务事项。</p>
+    <ul>
+      <li><b>智能问答</b>：依托大模型推理能力，对政务服务事项自然对话问答，替代机械问答；</li>
+      <li><b>智能导引</b>：告诉群众"办什么、去哪办、带什么材料"，多轮对话逐步导引；</li>
+      <li><b>智能审批</b>：材料自动比对、留存资料一键调取，实现标准化自动审批；</li>
+      <li><b>证照查询 / 智能问效</b>：证照信息快速查询，办理效果全程跟踪评估。</li>
+    </ul>
+    <p><b>多入口触达</b>：银川市政府门户网站、"银川政务服务"公众号、"i银川"APP 三端同步上线，自然对话即可完成咨询、预约、申报、查询。</p>
+    <p class="info">落地基础：2024 年已完成 26 个高频事项标准化改造，为智能审批打底。典型效果——公积金提取类事项从排队、复印材料，变为手机号、一键调取、即办即走。</p>
+  </div>
+
+  <h3>案例总览</h3>
+  <table>
+    <tr><th>案例</th><th>时间</th><th>定位</th><th>要点</th></tr>
+    <tr><td>青岛"金宏办公智能体"</td><td>2026.05</td><td>对内办公</td><td>公文写作、政策对比、政讯智搜等 10 项任务；全文档解析、会议智办、一句话生成分析报告等 9 大应用，对接办文、办会、办事核心需求</td></tr>
+    <tr><td>银川"AI+政务服务"</td><td>2026.03</td><td>对外服务</td><td>首批 9 个应用场景，政务 AI 助手"银小服"上线，覆盖智能导引、智能审批、智能问效三大领域</td></tr>
+    <tr><td>金山办公 WPS 365 政务版</td><td>2026.08</td><td>办公平台</td><td>集中展示公文起草、智能审校、数据报送等政务办公全场景 AI 能力</td></tr>
+  </table>
+  <p style="font-size:14px;color:#555;margin-top:8px;"><b>定位差异提示：</b>青岛金宏属"对内办公型"（帮机关自身办文办会办事），银川银小服属"对外服务型"（服务企业群众办事）。TeleAgent 恰好内外两条线都能覆盖（对内文档/办公 + 对外问答/材料核验），推广可采取"一个底座、对内对外两条线"的打包说法。</p>
+
+  <h2>七、TeleAgent 面向政务的突出特点</h2>
+  <table>
+    <tr><th>特点</th><th>对政务客户的价值</th></tr>
+    <tr><td>本地化处理，数据不出内网</td><td>敏感文件、内部数据在本地完成处理，满足涉密合规要求</td></tr>
+    <tr><td>长期记忆</td><td>持续熟悉本单位文风、业务背景与历史文件，越用越贴合</td></tr>
+    <tr><td>定时任务</td><td>日报、舆情、催报、提醒自动定时执行，无需人工值守</td></tr>
+    <tr><td>文档全家桶</td><td>公文、Excel 表格、PPT、PDF、图片一套搞定，无需切换多个工具</td></tr>
+    <tr><td>可私有化部署</td><td>支持内网部署环境，适配政务大模型底座，可集成单位既有系统</td></tr>
+  </table>
+
+  <div class="note">
+    <b>落地建议：</b>建议分两批推进——第一批先上"公文起草 + 公文审校 + 政策问答 + 会议纪要"四个高频刚需场景，见效快、易推广；第二批再扩展数据分析、舆情简报、定时报送等深度场景。
+  </div>
+
+  <div class="footer">TeleAgent 数智公务员推广素材 · 初稿（2026-09-15）</div>
+</div>
+</body>
+</html>
