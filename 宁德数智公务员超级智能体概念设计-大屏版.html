@@ -30,7 +30,7 @@
   /* 顶部栏 */
   #topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;
     justify-content:space-between;padding:2.4vh 4.5vw 0;pointer-events:none}
-  #topbar .logo{display:none;font-size:1.05vw;letter-spacing:.5vw;color:#fff;font-weight:600;
+  #topbar .logo{font-size:1.05vw;letter-spacing:.5vw;color:#fff;font-weight:600;
     background:linear-gradient(90deg,var(--red),#ff4a56);padding:.5vw 1.1vw;border-radius:.4vw;white-space:nowrap}
   #topbar .mid{font-size:1.1vw;color:var(--dim);letter-spacing:.4vw;white-space:nowrap}
   #topbar .right{display:flex;align-items:center;gap:1.6vw;white-space:nowrap}
@@ -899,6 +899,8 @@ function play(n){
   document.getElementById('pno').textContent=(n+1)+'/'+N;
   document.getElementById('catLabel').textContent=CATNAMES[next.id]||'';
   document.getElementById('seq').textContent=SEQN[next.id]||'';
+  var logoEl=document.querySelector('#topbar .logo');
+  if(logoEl)logoEl.style.display=(next.id==='smap')?'none':'inline-block';
   var pf=document.getElementById('pfill');
   pf.style.transition='none'; pf.style.width='0';
   requestAnimationFrame(function(){requestAnimationFrame(function(){
