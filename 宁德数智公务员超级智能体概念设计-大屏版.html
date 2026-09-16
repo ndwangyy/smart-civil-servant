@@ -64,11 +64,13 @@
   /* 场景页左右分栏 */
   .scene{display:grid;grid-template-columns:5fr 7fr;gap:3.4vw;align-items:center}
   /* TeleAgent 定制版外壳 */
-  .app-bar{display:flex;align-items:center;gap:1vw;background:rgba(255,255,255,.06);
+  .app-bar{display:flex;align-items:center;justify-content:space-between;gap:1vw;background:rgba(255,255,255,.06);
     border-bottom:1px solid var(--line);border-radius:1vw 1vw 0 0;padding:1vh 1.4vw;margin:-2.4vh -1.6vw 1.8vh}
-  .ab-logo{font-weight:700;color:#fff;background:linear-gradient(90deg,var(--red),#ff4a56);
-    padding:.2vw .8vw;border-radius:.3vw;font-size:1.05vw;letter-spacing:.1vw;white-space:nowrap}
-  .ab-name{font-size:.95vw;color:var(--dim);letter-spacing:.3vw;flex:1;text-align:center;white-space:nowrap}
+  .ab-logo{display:inline-flex;align-items:center;gap:.5vw;color:#fff;font-weight:700;
+    font-size:1.15vw;letter-spacing:.15vw;white-space:nowrap}
+  .ab-icon{width:1.8vw;height:1.8vw;border-radius:.5vw;background:linear-gradient(135deg,var(--red),#ff4a56);
+    display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 .7vw rgba(230,0,18,.4);flex:0 0 1.8vw}
+  .ab-icon::before{content:"✦";color:#fff;font-size:1.05vw;line-height:1}
   .ab-dots{display:flex;gap:.4vw}
   .ab-dots i{width:.45vw;height:.45vw;border-radius:50%;background:rgba(255,255,255,.22)}
   .ab-dots i:first-child{background:var(--red)}
@@ -786,7 +788,7 @@
 /* 注入 TeleAgent 定制版外壳到每个演示区 */
 document.querySelectorAll('.stage').forEach(function(st){
   var bar=document.createElement('div');bar.className='app-bar';
-  bar.innerHTML='<span class="ab-logo">⬢ TeleAgent</span><span class="ab-name">数智公务员 · 中国电信定制版</span><span class="ab-dots"><i></i><i></i><i></i></span>';
+  bar.innerHTML='<span class="ab-logo"><i class="ab-icon"></i>数智公务员</span><span class="ab-dots"><i></i><i></i><i></i></span>';
   st.insertBefore(bar,st.firstChild);
 });
 var slides=[].slice.call(document.querySelectorAll('#deck .slide'));

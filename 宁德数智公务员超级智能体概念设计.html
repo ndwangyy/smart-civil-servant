@@ -76,11 +76,13 @@
     padding:2px 8px;border-radius:10px}
   .tag-row .hot{color:#fff;background:rgba(230,0,18,.85);border-color:transparent}
   /* TeleAgent 定制版外壳 */
-  .app-bar{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);
+  .app-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(255,255,255,.06);
     border-bottom:1px solid var(--line);border-radius:12px 12px 0 0;padding:7px 12px;margin:-14px -14px 12px}
-  .ab-logo{font-weight:700;color:#fff;background:linear-gradient(90deg,var(--red),#ff4a56);
-    padding:3px 9px;border-radius:4px;font-size:11.5px;letter-spacing:1px;white-space:nowrap}
-  .ab-name{font-size:10.5px;color:var(--dim);letter-spacing:2px;flex:1;text-align:center;white-space:nowrap}
+  .ab-logo{display:inline-flex;align-items:center;gap:6px;color:#fff;font-weight:700;
+    font-size:12.5px;letter-spacing:1px;white-space:nowrap}
+  .ab-icon{width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--red),#ff4a56);
+    display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(230,0,18,.4);flex:0 0 20px}
+  .ab-icon::before{content:"✦";color:#fff;font-size:11px;line-height:1}
   .ab-dots{display:flex;gap:4px}
   .ab-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22)}
   .ab-dots i:first-child{background:var(--red)}
@@ -828,7 +830,7 @@ var catOf=function(el){var id=el.id;return catMap[id]!==undefined?catMap[id]:0;}
 /* 注入 TeleAgent 定制版外壳到每个演示区 */
 document.querySelectorAll('.stage').forEach(function(st){
   var bar=document.createElement('div');bar.className='app-bar';
-  bar.innerHTML='<span class="ab-logo">⬢ TeleAgent</span><span class="ab-name">数智公务员 · 中国电信定制版</span><span class="ab-dots"><i></i><i></i><i></i></span>';
+  bar.innerHTML='<span class="ab-logo"><i class="ab-icon"></i>数智公务员</span><span class="ab-dots"><i></i><i></i><i></i></span>';
   st.insertBefore(bar,st.firstChild);
 });
 var CATNAMES={s0:'封面','s-map':'场景总览 · 22 大场景',s21:'★ 领导重点关注',s22:'★ 领导重点关注',s1:'办文 · 公文写作与审校',s2:'办文 · 公文写作与审校',s3:'办文 · 公文写作与审校',s4:'办文 · 公文写作与审校',s5:'办文 · 公文写作与审校',s6:'办会 · 会议组织与纪要',s7:'办会 · 会议组织与纪要',s8:'办会 · 会议组织与纪要',s9:'办事 · 政务服务与日常事务',s10:'办事 · 政务服务与日常事务',s11:'办事 · 政务服务与日常事务',s12:'办事 · 政务服务与日常事务',s13:'办事 · 政务服务与日常事务',s14:'办事 · 政务服务与日常事务',s15:'办事 · 政务服务与日常事务',s16:'决策支撑 · 信息研判',s17:'决策支撑 · 信息研判',s18:'决策支撑 · 信息研判',s19:'学习培训 · 能力提升',s20:'学习培训 · 能力提升',scase:'真实案例 · 各地实践',sfeat:'TeleAgent 政务特点',splan:'落地建议 · 两步走',ssend:'结束页'};
