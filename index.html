@@ -185,9 +185,16 @@
   .phase li{font-size:13.5px;color:var(--sub);line-height:1.75}
   .phase li::before{content:"· ";color:var(--red)}
   /* 结尾 */
-  #send{justify-content:center;align-items:center;text-align:center}
-  #send .big{font-size:30px;font-weight:800;letter-spacing:3px;margin-bottom:14px}
-  #send .small{font-size:13px;color:var(--sub);letter-spacing:2px;line-height:2}
+  #ssend{justify-content:center;align-items:center;text-align:center}
+  #ssend .big{font-size:34px;font-weight:800;letter-spacing:4px;margin-bottom:12px;
+    background:linear-gradient(180deg,#fff,#ffd9dc);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #ssend .small{font-size:14px;color:var(--sub);letter-spacing:3px;line-height:2.2}
+  #ssend .divider{width:64px;height:3px;background:linear-gradient(90deg,var(--red),#ff6a75);border-radius:2px;margin:20px auto}
+  #ssend .brand{font-size:12px;color:var(--dim);letter-spacing:4px;margin-top:34px}
+  #ssend .end-ring .ring-num{position:absolute;inset:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-family:Georgia,serif;font-size:44px;font-weight:700;color:#fff;line-height:1;
+    text-shadow:0 0 22px rgba(230,0,18,.85)}
+  #ssend .end-ring .ring-num small{font-size:10px;color:#ffd0d5;letter-spacing:3px;margin-top:3px;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
   .end-ring{width:150px;height:150px;border-radius:50%;margin:0 auto 22px;position:relative;
     border:1px solid rgba(230,0,18,.4);animation:pulse 2.4s infinite}
   .end-ring::before{content:"";position:absolute;inset:14px;border-radius:50%;border:1px solid rgba(230,0,18,.55)}
@@ -805,13 +812,14 @@
 
   <!-- 结尾 -->
   <section class="slide" id="ssend">
-    <div class="end-ring"></div>
-    <div class="big">宁德数智公务员</div>
-    <div class="small">22 个场景 · 一个智能体<br>让公务员从繁杂事务中解放出来<br>把时间留给决策与创新</div>
-    <div class="cover-feats" style="margin-top:26px">
+    <div class="end-ring"><div class="ring-num">22<small>大场景</small></div></div>
+    <div class="big">宁德数智公务员超级智能体</div>
+    <div class="small">让公务员从繁杂事务中解放出来<br>把时间留给决策与创新</div>
+    <div class="divider"></div>
+    <div class="cover-feats" style="margin-top:0">
       <span>办文提效</span><span>办会提速</span><span>办事提质</span>
     </div>
-    <div class="scroll-hint" style="position:static;margin-top:40px;animation:bounce 1.6s infinite">中国电信 · 星辰大模型 · 数智公务员</div>
+    <div class="brand">中国电信 · 星辰大模型 · 数智公务员</div>
   </section>
 
 </div>
