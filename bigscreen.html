@@ -199,18 +199,17 @@
 <body>
 <div id="deck">
 
-  <!-- 封面 -->
-  <section class="slide" id="s0" data-dwell="8">
-    <div class="cover-logo">中国电信 · 星辰智能体</div>
-    <div class="cover-title">宁德数智公务员超级智能体<br>概念设计</div>
-    <div class="cover-sub">22 个政务办公场景 · 一个智能体</div>
-    <div class="big-num" data-count="22">0</div>
-    <div class="big-label">AI 使用场景</div>
+  <!-- 结尾 -->
+  <section class="slide" id="ssend" data-dwell="8">
+    <div class="end-ring"><div class="ring-num">22<small>大场景</small></div></div>
+    <div class="big">宁德数智公务员超级智能体</div>
+    <div class="small">让公务员从繁杂事务中解放出来<br>把时间留给决策与创新</div>
+    <div class="divider"></div>
     <div class="cover-feats">
-      <span>办文 · 办会 · 办事</span><span>数据不出内网</span><span>长期记忆</span><span>定时任务</span><span>可私有化部署</span>
+      <span>办文提效</span><span>办会提速</span><span>办事提质</span>
     </div>
+    <div class="brand">中国电信 · 星辰智能体 · 数智公务员</div>
   </section>
-
   <!-- 总览 -->
   <section class="slide" id="smap" data-dwell="14">
     <div class="map-head fade1">
@@ -754,17 +753,6 @@
     <p class="desc fade4" style="text-align:center;margin-top:2.6vh">公文模板、办事流程、汇报风格……一切经验都能变成技能，传下去、复用起来</p>
   </section>
 
-  <!-- 结尾 -->
-  <section class="slide" id="ssend" data-dwell="8">
-    <div class="end-ring"><div class="ring-num">22<small>大场景</small></div></div>
-    <div class="big">宁德数智公务员超级智能体</div>
-    <div class="small">让公务员从繁杂事务中解放出来<br>把时间留给决策与创新</div>
-    <div class="divider"></div>
-    <div class="cover-feats">
-      <span>办文提效</span><span>办会提速</span><span>办事提质</span>
-    </div>
-    <div class="brand">中国电信 · 星辰智能体 · 数智公务员</div>
-  </section>
 
 </div>
 
@@ -773,7 +761,7 @@
   <div class="mid" id="brandline">宁德数智公务员超级智能体 · 概念设计</div>
   <div class="right">
     <div class="clock" id="clock">--:--:--<small id="cdate"></small></div>
-    <div class="pno" id="pno">1/26</div>
+    <div class="pno" id="pno">1/25</div>
   </div>
 </div>
 <div id="bottombar">
@@ -788,7 +776,7 @@
 /* ====== 展厅大屏自动轮播引擎 ====== */
 var slides=[].slice.call(document.querySelectorAll('#deck .slide'));
 var N=slides.length, idx=0, timer=null;
-var CATNAMES={s0:'封面',smap:'场景总览 · 22 大场景',p1:'★ 领导重点关注',p2:'★ 领导重点关注',p3:'办文 · 公文写作与审校',p4:'办文 · 公文写作与审校',p5:'办文 · 公文写作与审校',p6:'办文 · 公文写作与审校',p7:'办文 · 公文写作与审校',p8:'办会 · 会议组织与纪要',p9:'办会 · 会议组织与纪要',p10:'办会 · 会议组织与纪要',p11:'办事 · 政务服务与日常事务',p12:'办事 · 政务服务与日常事务',p13:'办事 · 政务服务与日常事务',p14:'办事 · 政务服务与日常事务',p15:'办事 · 政务服务与日常事务',p16:'办事 · 政务服务与日常事务',p17:'办事 · 政务服务与日常事务',p18:'决策支撑 · 信息研判',p19:'决策支撑 · 信息研判',p20:'决策支撑 · 信息研判',p21:'学习培训 · 能力提升',p22:'学习培训 · 能力提升',pcase:'真实案例 · 各地实践',pfeat:'TeleAgent 政务特点',pplan:'落地建议 · 两步走',ssend:'结束页'};
+var CATNAMES={smap:'场景总览 · 22 大场景',p1:'★ 领导重点关注',p2:'★ 领导重点关注',p3:'办文 · 公文写作与审校',p4:'办文 · 公文写作与审校',p5:'办文 · 公文写作与审校',p6:'办文 · 公文写作与审校',p7:'办文 · 公文写作与审校',p8:'办会 · 会议组织与纪要',p9:'办会 · 会议组织与纪要',p10:'办会 · 会议组织与纪要',p11:'办事 · 政务服务与日常事务',p12:'办事 · 政务服务与日常事务',p13:'办事 · 政务服务与日常事务',p14:'办事 · 政务服务与日常事务',p15:'办事 · 政务服务与日常事务',p16:'办事 · 政务服务与日常事务',p17:'办事 · 政务服务与日常事务',p18:'决策支撑 · 信息研判',p19:'决策支撑 · 信息研判',p20:'决策支撑 · 信息研判',p21:'学习培训 · 能力提升',p22:'学习培训 · 能力提升',pcase:'真实案例 · 各地实践',pfeat:'TeleAgent 政务特点',pplan:'落地建议 · 两步走',ssend:'开场 · 宁德数智公务员'};
 var SEQN={p1:'场景 01 / 22',p2:'场景 02 / 22',p3:'场景 03 / 22',p4:'场景 04 / 22',p5:'场景 05 / 22',p6:'场景 06 / 22',p7:'场景 07 / 22',p8:'场景 08 / 22',p9:'场景 09 / 22',p10:'场景 10 / 22',p11:'场景 11 / 22',p12:'场景 12 / 22',p13:'场景 13 / 22',p14:'场景 14 / 22',p15:'场景 15 / 22',p16:'场景 16 / 22',p17:'场景 17 / 22',p18:'场景 18 / 22',p19:'场景 19 / 22',p20:'场景 20 / 22',p21:'场景 21 / 22',p22:'场景 22 / 22'};
 
 function startTw(el){
